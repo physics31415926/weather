@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>最近1小时温湿度折线图</title>
+    </head>
+    <body>
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <button  onclick="window.location.href='./index.php/'">返回</button>
+        <button  onclick="window.location.href='./th_line_week.html'">查看最近一周</button>
+        <button  onclick="window.location.href='./th_line_day.html'">查看最近一天</button>
+    </body>
+    <script src="https://cdn.staticfile.org/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+    <script>
+        function update_list() {
+            $.get("./api_hour.php")
+            .done((data) => {
+                let result = JSON.parse(data);
+
+                let timestamp = result.map(e => e.timestamp);
+                let temperature = result.map(e => e.temperature);
+                let humidity = result.map(e => e.humidity);
+
+                let ctx = document.getElementById("chart").getContext('2d');
+                let chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: "温度/℃",
+                                data: temperature,
+                                yAxisID: "temperature",
+                                fill: false,
+                                borderColor: "#BFC3F7",
+                                backgroundColor: "#B99AF7",
+                                lineTension:0.5,
+                            },
+                            {
+                                label: "湿度/%",
+                                data: humidity,
+                                yAxisID: "humidity",
+                                fill: false,
+                                borderColor: "#F7C255",
+                                backgroundColor: "#F7B127",
+                                lineTension:0.5,
+                            }
+                        ],
+                        labels: timestamp
+                    },
+                    options: {
+                        hoverMode: 'index',
+                        stacked: false,
+                        responsive: true,
+                        scales: {
+                            yAxes: [{
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                id: 'temperature',
+                            }, {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                id: 'humidity',
+                                gridLines: {
+                                    drawOnChartArea: false,
+                                },
+                            }],
+                        },
+                    }
+                });
+            });
+        }
+        window.onload = function() {
+            update_list();
+        }
+    </script>
+
+</html>

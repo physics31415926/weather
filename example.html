@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test</title>
+    </head>
+    <body>
+        <canvas id="chart"></canvas>
+    </body>
+    <script src="https://cdn.staticfile.org/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+    <script>
+        function update_list() {
+            $.get("./api1.php?count=10")
+            .done((data) => {
+                let result = JSON.parse(data);
+
+                let time = result.map(e => e.time);
+                let pm25 = result.map(e => e.pm25);
+                let pm10 = result.map(e => e.pm10);
+
+                let ctx = document.getElementById("chart").getContext('2d');
+                let chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: "PM 2.5",
+                                data: pm25,
+                                yAxisID: "pm25",
+                                fill: false,
+                                borderColor: "#BFC3F7",
+                                backgroundColor: "#B99AF7",
+                            },
+                            {
+                                label: "PM 10",
+                                data: pm10,
+                                yAxisID: "pm10",
+                                fill: false,
+                                borderColor: "#F7C255",
+                                backgroundColor: "#F7B127",
+                            }
+                        ],
+                        labels: time
+                    },
+                    options: {
+                        hoverMode: 'index',
+                        stacked: false,
+                        responsive: true,
+                        scales: {
+                            yAxes: [{
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                id: 'pm25',
+                            }, {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                id: 'pm10',
+                                gridLines: {
+                                    drawOnChartArea: false,
+                                },
+                            }],
+                        },
+                    }
+                });
+            });
+        }
+        window.onload = function() {
+            update_list();
+        }
+    </script>
+</html>

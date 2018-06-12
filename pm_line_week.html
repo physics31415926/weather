@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>最近一周颗粒物折线图</title>
+</head>
+<body>
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <button  onclick="window.location.href='./index.php/'">返回</button>
+        <button  onclick="window.location.href='./pm_line_day.html'">查看最近一天</button>
+        <button  onclick="window.location.href='./pm_line_hour.html'">查看最近一小时</button>
+    </body>
+    <script src="https://cdn.staticfile.org/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+    <script>
+        function update_list() {
+            $.get("./api_week_pm.php")
+            .done((data) => {
+                let result = JSON.parse(data);
+
+                let timestamp = result.map(e => e.timestamp);
+                let pm1 = result.map(e => e.pm1);
+                let pm25 = result.map(e => e.pm25);
+                let pm10 = result.map(e => e.pm10);
+
+                let ctx = document.getElementById("chart").getContext('2d');
+                let chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: "pm1",
+                                data: pm1,
+                                yAxisID: "pm",
+                                fill: false,
+                                borderColor: "#FF6633",
+                                backgroundColor: "#FF6600",
+                                lineTension:0.5,
+                            },
+                            {
+                                label: "pm2.5",
+                                data: pm25,
+                                yAxisID: "pm",
+                                fill: false,
+                                borderColor: "#33CC33",
+                                backgroundColor: "#00CC00",
+                                lineTension:0.5,
+                            },
+                            {
+                                label: "pm10",
+                                data: pm10,
+                                yAxisID: "pm",
+                                fill: false,
+                                borderColor: "#0099FF",
+                                backgroundColor: "#009999",
+                                lineTension:0.5,
+                            }
+
+                        ],
+                        labels: timestamp
+                        
+                    },
+                    options: {
+                        hoverMode: 'index',
+                        stacked: false,
+                        responsive: true,
+                        scales: {
+                            yAxes: [{
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                id: 'pm',
+                            }],
+                        },
+                    }
+                    
+                });
+            });
+        }
+        window.onload = function() {
+            update_list();
+        }
+    </script>
+</html>
